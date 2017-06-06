@@ -1,3 +1,4 @@
+UCI_experiments/results/
 # kernprof profiling
 *.py.lprof
 
