@@ -12,7 +12,7 @@ import numpy as np
 import scipy.linalg as npalg
 from scipy import special
 from scipy.optimize import minimize
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import time
 import pdb
 from scipy.cluster.vq import kmeans2

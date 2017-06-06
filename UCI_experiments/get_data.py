@@ -20,8 +20,8 @@ def download(name, data_path):
     print 'Downloading file: {}'.format(name)
     download_url = 'https://hrs13publicdata.blob.core.windows.net/publicdata/'
     s1 = 'cd {}'.format(data_path)
-    s2 = 'wget {}{}.gz'.format(download_url, name)
-    s3 = 'gzip -d {}.gz'.format(name)
+    s2 = 'sudo wget {}{}.gz'.format(download_url, name)
+    s3 = 'sudo gzip -d {}.gz'.format(name)
     s = '{}\n{}\n{}\n'.format(s1, s2, s3)
     print s
     proc = Popen(s, shell=True)

@@ -41,31 +41,33 @@ datasets = [
 ]
 
 
-identifier = 'test_1'
+identifier = 'run_1'
  
-lr = 0.01
+lr = 0.001
 mb_size = 100
 
 Models = []
 
 # aegp models
-def make_aepdgp_model(L, its, M=100):
+def make_aepdgp_model(L, its, a, M=100):
     class AEPDGP(aep.SDGPR):
-        model_name = 'aepdgp_{}_{}'.format(M, L)
+        model_name = 'aepdgp_M{}_its{}_L{}_alpha{}'.format(M, its, L, alpha)
         aep = True
         iterations = its
+        alpha = a
         def __init__(self, X, Y):
             hidden_size = [2, ] * (L - 1)
             aep.SDGPR.__init__(self, X, Y, M, hidden_size, lik='Gaussian')
     Models.append(AEPDGP)
-    
-for its in [100,]: #1000, 10000]:
-    [make_aepdgp_model(L, its) for L in [1, ]]
+ 
+for alpha in [0.001, 0.5, 1.]:
+    for its in [10000]:
+        [make_aepdgp_model(L, its, alpha) for L in [1, 2, 3]]
 
 ## single layer models for comparison 
-def make_single_layer_GPflow_models(M=100):
+def make_single_layer_GPflow_models(M):
     class FITC(GPRFITC):
-        model_name = 'fitc_{}'.format(M)
+        model_name = 'fitc_M{}'.format(M)
         aep = False
         def __init__(self, X, Y):
             Z = kmeans2(X, M, minit='points')[0]
@@ -73,14 +75,14 @@ def make_single_layer_GPflow_models(M=100):
     Models.append(FITC)
     
     class VFE(SGPR):
-        model_name = 'vfe_{}'.format(M)
+        model_name = 'vfe_M{}'.format(M)
         aep = False
         def __init__(self, X, Y):
             Z = kmeans2(X, M, minit='points')[0]
             SGPR.__init__(self, X, Y, RBF(X.shape[1]), Z)
     Models.append(VFE)
 
-#make_single_layer_GPflow_models()
+make_single_layer_GPflow_models(100)
 
 
 def assess_model(model, Xs, Ys):
@@ -115,7 +117,9 @@ def do(dataset, split, Model, path):
     if Model.aep is True:
         model.optimise(method='Adam',
                        adam_lr=lr,
-                       maxiter=Model.iterations)
+                       maxiter=Model.iterations,
+                       alpha=Model.alpha,
+                       mb_size=mb_size)
     else:
         model.optimize()
         
